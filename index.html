@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAA Algorithm Visualizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+        }
+
+        .algorithms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .algorithm-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .algorithm-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #00d9ff;
+            box-shadow: 0 20px 40px rgba(0, 217, 255, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            color: #a0a0a0;
+            line-height: 1.6;
+        }
+
+        .card-category {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 5px 12px;
+            background: rgba(0, 217, 255, 0.2);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #00d9ff;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #666;
+        }
+
+        footer a {
+            color: #00d9ff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 DAA Algorithm Visualizer</h1>
+            <p class="subtitle">Interactive visualizations of Design and Analysis of Algorithms</p>
+        </header>
+
+        <main>
+            <div class="algorithms-grid">
+                <a href="dijikstra_algorithm.html" class="algorithm-card">
+                    <div class="card-icon">🗺️</div>
+                    <h2 class="card-title">Dijkstra's Algorithm</h2>
+                    <p class="card-description">Find the shortest path between nodes in a graph. Widely used in routing and navigation systems.</p>
+                    <span class="card-category">Graph Algorithm</span>
+                </a>
+
+                <a href="prims_algorithm.html" class="algorithm-card">
+                    <div class="card-icon">🌲</div>
+                    <h2 class="card-title">Prim's Algorithm</h2>
+                    <p class="card-description">Construct a minimum spanning tree for a weighted undirected graph using greedy approach.</p>
+                    <span class="card-category">Graph Algorithm</span>
+                </a>
+
+                <a href="kruskal_visualizer.html" class="algorithm-card">
+                    <div class="card-icon">🔗</div>
+                    <h2 class="card-title">Kruskal's Algorithm</h2>
+                    <p class="card-description">Find minimum spanning tree by sorting edges and using union-find data structure.</p>
+                    <span class="card-category">Graph Algorithm</span>
+                </a>
+
+                <a href="ford_fulkerson.html" class="algorithm-card">
+                    <div class="card-icon">🌊</div>
+                    <h2 class="card-title">Ford-Fulkerson Algorithm</h2>
+                    <p class="card-description">Compute the maximum flow in a flow network. Used in network routing and bipartite matching.</p>
+                    <span class="card-category">Network Flow</span>
+                </a>
+
+                <a href="knapsack_visualizer.html" class="algorithm-card">
+                    <div class="card-icon">🎒</div>
+                    <h2 class="card-title">Knapsack Problem</h2>
+                    <p class="card-description">Solve the classic optimization problem using dynamic programming approach.</p>
+                    <span class="card-category">Dynamic Programming</span>
+                </a>
+
+                <a href="coin_change_visualizer.html" class="algorithm-card">
+                    <div class="card-icon">🪙</div>
+                    <h2 class="card-title">Coin Change Problem</h2>
+                    <p class="card-description">Find the minimum number of coins needed to make a given amount using dynamic programming.</p>
+                    <span class="card-category">Dynamic Programming</span>
+                </a>
+
+                <a href="huffman_coding_algorithm.html" class="algorithm-card">
+                    <div class="card-icon">📦</div>
+                    <h2 class="card-title">Huffman Coding</h2>
+                    <p class="card-description">Build optimal prefix-free codes for data compression using a greedy algorithm.</p>
+                    <span class="card-category">Greedy Algorithm</span>
+                </a>
+            </div>
+        </main>
+
+        <footer>
+            <p>Made with ❤️ for learning algorithms | <a href="https://github.com" target="_blank">View on GitHub</a></p>
+        </footer>
+    </div>
+</body>
+</html>
