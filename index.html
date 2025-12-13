@@ -1,181 +1,416 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAA Algorithm Visualizer</title>
+    <meta name="description"
+        content="Interactive visualizations for Design and Analysis of Algorithms including Dijkstra, Prim's, Kruskal's, Ford-Fulkerson, Knapsack, Coin Change, and Huffman Coding">
+    <title>DAA Algorithm Visualizer - Interactive Algorithm Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
             min-height: 100vh;
-            color: #fff;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
+        /* Skip Link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -50px;
+            left: 0;
+            background: #6366f1;
+            color: white;
+            padding: 12px 24px;
+            z-index: 100;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 0 0 8px 0;
+            transition: top 0.3s;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            background: linear-gradient(90deg, #00d9ff, #00ff88);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: #a0a0a0;
-        }
-
-        .algorithms-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 40px;
+        .skip-link:focus {
+            top: 0;
         }
 
         .algorithm-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 30px;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-            display: block;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .algorithm-card:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #00d9ff;
-            box-shadow: 0 20px 40px rgba(0, 217, 255, 0.2);
+        .algorithm-card:hover,
+        .algorithm-card:focus {
+            transform: translateY(-8px);
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.25);
+        }
+
+        .algorithm-card:focus {
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
         }
 
         .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
         }
 
-        .card-title {
-            font-size: 1.4rem;
-            margin-bottom: 10px;
-            color: #fff;
+        .glow-text {
+            background: linear-gradient(90deg, #6366f1, #a855f7, #6366f1);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shine 3s linear infinite;
         }
 
-        .card-description {
-            font-size: 0.95rem;
-            color: #a0a0a0;
-            line-height: 1.6;
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
         }
 
-        .card-category {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 5px 12px;
-            background: rgba(0, 217, 255, 0.2);
-            border-radius: 20px;
-            font-size: 0.8rem;
-            color: #00d9ff;
+        .category-badge {
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
         }
 
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #666;
+        .category-badge.dp {
+            background: rgba(234, 179, 8, 0.15);
+            border-color: rgba(234, 179, 8, 0.3);
+            color: #fbbf24;
         }
 
-        footer a {
-            color: #00d9ff;
-            text-decoration: none;
+        .category-badge.graph {
+            background: rgba(34, 197, 94, 0.15);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #4ade80;
         }
 
-        footer a:hover {
-            text-decoration: underline;
+        .category-badge.greedy {
+            background: rgba(236, 72, 153, 0.15);
+            border-color: rgba(236, 72, 153, 0.3);
+            color: #f472b6;
+        }
+
+        .category-badge.flow {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: rgba(6, 182, 212, 0.3);
+            color: #22d3ee;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .algorithm-card {
+                transition: none;
+            }
+
+            .algorithm-card:hover,
+            .algorithm-card:focus {
+                transform: none;
+            }
+
+            .glow-text {
+                animation: none;
+            }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🎯 DAA Algorithm Visualizer</h1>
-            <p class="subtitle">Interactive visualizations of Design and Analysis of Algorithms</p>
+
+<body class="font-sans text-dark-200 antialiased">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="border-b border-dark-700/50 bg-dark-900/50 backdrop-blur-sm sticky top-0 z-50" role="banner">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-bold text-white">DAA Visualizer</h1>
+                            <p class="text-xs text-dark-400 hidden sm:block">Algorithm Learning Platform</p>
+                        </div>
+                    </div>
+                    <nav class="hidden md:flex items-center gap-6" aria-label="Main navigation">
+                        <a href="#algorithms"
+                            class="text-sm text-dark-300 hover:text-white transition-colors">Algorithms</a>
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+                            class="text-sm text-dark-300 hover:text-white transition-colors flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            GitHub
+                        </a>
+                    </nav>
+                </div>
+            </div>
         </header>
 
-        <main>
-            <div class="algorithms-grid">
-                <a href="dijikstra_algorithm.html" class="algorithm-card">
-                    <div class="card-icon">🗺️</div>
-                    <h2 class="card-title">Dijkstra's Algorithm</h2>
-                    <p class="card-description">Find the shortest path between nodes in a graph. Widely used in routing and navigation systems.</p>
-                    <span class="card-category">Graph Algorithm</span>
-                </a>
+        <!-- Hero Section -->
+        <section class="py-16 sm:py-24 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6">
+                    <span class="text-white">Master Algorithms</span>
+                    <br>
+                    <span class="glow-text">Through Visualization</span>
+                </h2>
+                <p class="text-lg sm:text-xl text-dark-400 max-w-2xl mx-auto leading-relaxed">
+                    Interactive visualizations to understand Design and Analysis of Algorithms.
+                    Watch algorithms come alive, step through each operation, and build intuition.
+                </p>
+            </div>
+        </section>
 
-                <a href="prims_algorithm.html" class="algorithm-card">
-                    <div class="card-icon">🌲</div>
-                    <h2 class="card-title">Prim's Algorithm</h2>
-                    <p class="card-description">Construct a minimum spanning tree for a weighted undirected graph using greedy approach.</p>
-                    <span class="card-category">Graph Algorithm</span>
-                </a>
+        <!-- Main Content -->
+        <main id="main-content" class="flex-1 px-4 sm:px-6 lg:px-8 pb-16">
+            <div class="max-w-7xl mx-auto">
+                <section id="algorithms" aria-labelledby="algorithms-heading">
+                    <div class="flex items-center gap-3 mb-8">
+                        <h3 id="algorithms-heading" class="text-xl font-semibold text-white">Available Algorithms</h3>
+                        <span class="px-2 py-1 text-xs font-medium bg-indigo-500/20 text-indigo-400 rounded-full">7
+                            visualizers</span>
+                    </div>
 
-                <a href="kruskal_visualizer.html" class="algorithm-card">
-                    <div class="card-icon">🔗</div>
-                    <h2 class="card-title">Kruskal's Algorithm</h2>
-                    <p class="card-description">Find minimum spanning tree by sorting edges and using union-find data structure.</p>
-                    <span class="card-category">Graph Algorithm</span>
-                </a>
+                    <nav aria-label="Algorithm visualizers">
+                        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" role="list">
+                            <!-- Dijkstra's Algorithm -->
+                            <li>
+                                <a href="dijikstra_algorithm.html" class="algorithm-card block rounded-2xl p-6 h-full"
+                                    aria-label="Dijkstra's Algorithm - Graph Algorithm for finding shortest paths">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div
+                                            class="card-icon w-12 h-12 rounded-xl flex items-center justify-center shadow-lg">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                            </svg>
+                                        </div>
+                                        <span
+                                            class="category-badge graph px-3 py-1 rounded-full text-xs font-medium">Graph</span>
+                                    </div>
+                                    <h4 class="text-lg font-semibold text-white mb-2">Dijkstra's Algorithm</h4>
+                                    <p class="text-dark-400 text-sm leading-relaxed">
+                                        Find the shortest path between nodes in a weighted graph. Used in GPS navigation
+                                        and network routing.
+                                    </p>
+                                </a>
+                            </li>
 
-                <a href="ford_fulkerson.html" class="algorithm-card">
-                    <div class="card-icon">🌊</div>
-                    <h2 class="card-title">Ford-Fulkerson Algorithm</h2>
-                    <p class="card-description">Compute the maximum flow in a flow network. Used in network routing and bipartite matching.</p>
-                    <span class="card-category">Network Flow</span>
-                </a>
+                            <!-- Prim's Algorithm -->
+                            <li>
+                                <a href="prims_algorithm.html" class="algorithm-card block rounded-2xl p-6 h-full"
+                                    aria-label="Prim's Algorithm - Graph Algorithm for minimum spanning tree">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div
+                                            class="card-icon w-12 h-12 rounded-xl flex items-center justify-center shadow-lg">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                                            </svg>
+                                        </div>
+                                        <span
+                                            class="category-badge graph px-3 py-1 rounded-full text-xs font-medium">Graph</span>
+                                    </div>
+                                    <h4 class="text-lg font-semibold text-white mb-2">Prim's Algorithm</h4>
+                                    <p class="text-dark-400 text-sm leading-relaxed">
+                                        Build minimum spanning trees using a greedy approach. Essential for network
+                                        design.
+                                    </p>
+                                </a>
+                            </li>
 
-                <a href="knapsack_visualizer.html" class="algorithm-card">
-                    <div class="card-icon">🎒</div>
-                    <h2 class="card-title">Knapsack Problem</h2>
-                    <p class="card-description">Solve the classic optimization problem using dynamic programming approach.</p>
-                    <span class="card-category">Dynamic Programming</span>
-                </a>
+                            <!-- Kruskal's Algorithm -->
+                            <li>
+                                <a href="kruskal_visualizer.html" class="algorithm-card block rounded-2xl p-6 h-full"
+                                    aria-label="Kruskal's Algorithm - Graph Algorithm for minimum spanning tree">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div
+                                            class="card-icon w-12 h-12 rounded-xl flex items-center justify-center shadow-lg">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                            </svg>
+                                        </div>
+                                        <span
+                                            class="category-badge graph px-3 py-1 rounded-full text-xs font-medium">Graph</span>
+                                    </div>
+                                    <h4 class="text-lg font-semibold text-white mb-2">Kruskal's Algorithm</h4>
+                                    <p class="text-dark-400 text-sm leading-relaxed">
+                                        MST using sorted edges and union-find. Efficient for sparse graphs.
+                                    </p>
+                                </a>
+                            </li>
 
-                <a href="coin_change_visualizer.html" class="algorithm-card">
-                    <div class="card-icon">🪙</div>
-                    <h2 class="card-title">Coin Change Problem</h2>
-                    <p class="card-description">Find the minimum number of coins needed to make a given amount using dynamic programming.</p>
-                    <span class="card-category">Dynamic Programming</span>
-                </a>
+                            <!-- Ford-Fulkerson Algorithm -->
+                            <li>
+                                <a href="ford_fulkerson.html" class="algorithm-card block rounded-2xl p-6 h-full"
+                                    aria-label="Ford-Fulkerson Algorithm - Network Flow for maximum flow computation">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div
+                                            class="card-icon w-12 h-12 rounded-xl flex items-center justify-center shadow-lg">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                                            </svg>
+                                        </div>
+                                        <span
+                                            class="category-badge flow px-3 py-1 rounded-full text-xs font-medium">Network
+                                            Flow</span>
+                                    </div>
+                                    <h4 class="text-lg font-semibold text-white mb-2">Ford-Fulkerson</h4>
+                                    <p class="text-dark-400 text-sm leading-relaxed">
+                                        Compute maximum flow in networks. Used in bipartite matching and scheduling.
+                                    </p>
+                                </a>
+                            </li>
 
-                <a href="huffman_coding_algorithm.html" class="algorithm-card">
-                    <div class="card-icon">📦</div>
-                    <h2 class="card-title">Huffman Coding</h2>
-                    <p class="card-description">Build optimal prefix-free codes for data compression using a greedy algorithm.</p>
-                    <span class="card-category">Greedy Algorithm</span>
-                </a>
+                            <!-- Knapsack Problem -->
+                            <li>
+                                <a href="knapsack_visualizer.html" class="algorithm-card block rounded-2xl p-6 h-full"
+                                    aria-label="Knapsack Problem - Dynamic Programming optimization problem">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div
+                                            class="card-icon w-12 h-12 rounded-xl flex items-center justify-center shadow-lg">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                            </svg>
+                                        </div>
+                                        <span
+                                            class="category-badge dp px-3 py-1 rounded-full text-xs font-medium">Dynamic
+                                            Programming</span>
+                                    </div>
+                                    <h4 class="text-lg font-semibold text-white mb-2">Knapsack Problem</h4>
+                                    <p class="text-dark-400 text-sm leading-relaxed">
+                                        Classic optimization using DP. Maximize value within weight constraints.
+                                    </p>
+                                </a>
+                            </li>
+
+                            <!-- Coin Change Problem -->
+                            <li>
+                                <a href="coin_change_visualizer.html"
+                                    class="algorithm-card block rounded-2xl p-6 h-full"
+                                    aria-label="Coin Change Problem - Dynamic Programming for minimum coins">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div
+                                            class="card-icon w-12 h-12 rounded-xl flex items-center justify-center shadow-lg">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <span
+                                            class="category-badge dp px-3 py-1 rounded-full text-xs font-medium">Dynamic
+                                            Programming</span>
+                                    </div>
+                                    <h4 class="text-lg font-semibold text-white mb-2">Coin Change</h4>
+                                    <p class="text-dark-400 text-sm leading-relaxed">
+                                        Find minimum coins for a target amount. Foundation for DP problem-solving.
+                                    </p>
+                                </a>
+                            </li>
+
+                            <!-- Huffman Coding -->
+                            <li>
+                                <a href="huffman_coding_algorithm.html"
+                                    class="algorithm-card block rounded-2xl p-6 h-full"
+                                    aria-label="Huffman Coding - Greedy Algorithm for data compression">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div
+                                            class="card-icon w-12 h-12 rounded-xl flex items-center justify-center shadow-lg">
+                                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                                            </svg>
+                                        </div>
+                                        <span
+                                            class="category-badge greedy px-3 py-1 rounded-full text-xs font-medium">Greedy</span>
+                                    </div>
+                                    <h4 class="text-lg font-semibold text-white mb-2">Huffman Coding</h4>
+                                    <p class="text-dark-400 text-sm leading-relaxed">
+                                        Build optimal prefix-free codes for compression. Used in ZIP and JPEG.
+                                    </p>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </section>
             </div>
         </main>
 
-        <footer>
-            <p>Made with ❤️ for learning algorithms | <a href="https://github.com" target="_blank">View on GitHub</a></p>
+        <!-- Footer -->
+        <footer class="border-t border-dark-700/50 bg-dark-900/30 py-8" role="contentinfo">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p class="text-dark-400 text-sm">
+                        Made with ❤️ for learning algorithms
+                    </p>
+                    <div class="flex items-center gap-6">
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+                            class="text-dark-400 hover:text-white transition-colors text-sm flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path fill-rule="evenodd"
+                                    d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            View on GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
         </footer>
     </div>
 </body>
+
 </html>

@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prim's Algorithm Visualizer</title>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -21,252 +17,273 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
-                    },
-                    colors: {
-                        slate: {
-                            850: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617',
-                        }
                     }
                 }
             }
         }
     </script>
-
     <style>
         body {
-            background-color: #0f172a; /* Slate 900 */
-            color: #e2e8f0; /* Slate 200 */
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            font-family: 'Inter', sans-serif;
         }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1e293b; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #475569; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b; 
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
         }
 
         .code-line {
             transition: background-color 0.2s, border-left 0.2s;
-            border-left: 3px solid transparent;
-        }
-        .code-active {
-            background-color: rgba(56, 189, 248, 0.15); /* Sky blue tint */
-            border-left: 3px solid #38bdf8;
-            color: #e0f2fe;
+            border-left: 2px solid transparent;
         }
 
-        .node-circle {
-            transition: stroke 0.3s;
-            cursor: pointer;
+        .code-active {
+            background-color: rgba(99, 102, 241, 0.2);
+            border-left: 2px solid #818cf8;
         }
-        
+
         .control-btn {
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
+
+        .control-btn:hover {
+            transform: scale(1.05);
+        }
+
         .control-btn:active {
             transform: scale(0.95);
         }
+
         .control-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
         }
 
-        /* SVG Elements */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 2px;
+        }
+
         text {
             user-select: none;
             pointer-events: none;
         }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden">
 
+<body class="h-screen overflow-hidden text-slate-200">
     <!-- Header -->
-    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center shadow-md z-10 shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="bg-indigo-600 p-2 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+    <header class="glass-panel h-10 flex items-center justify-between px-3 border-b border-slate-700/50">
+        <div class="flex items-center gap-2">
+            <a href="index.html"
+                class="flex items-center gap-1 text-slate-400 hover:text-white transition-colors text-xs">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold text-white tracking-tight">Prim's Algorithm</h1>
-                <p class="text-xs text-slate-400">Minimum Spanning Tree Visualization</p>
+                Back
+            </a>
+            <div class="w-px h-4 bg-slate-700"></div>
+            <div class="flex items-center gap-1.5">
+                <div class="bg-indigo-600 p-1 rounded">
+                    <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <span class="text-xs font-semibold text-white">Prim's Algorithm</span>
+                <span class="text-[10px] text-slate-500">MST Visualization</span>
             </div>
         </div>
-
-        <div class="flex items-center gap-4">
-            <button onclick="visualizer.reset()" class="text-sm font-medium text-slate-300 hover:text-white transition-colors">Reset</button>
-            <button onclick="visualizer.generateNewGraph()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-lg shadow-indigo-500/20">
-                New Random Graph
+        <div class="flex items-center gap-2">
+            <button onclick="visualizer.reset()"
+                class="text-[10px] text-slate-400 hover:text-white transition-colors">Reset</button>
+            <button onclick="visualizer.generateNewGraph()"
+                class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 rounded text-[10px] font-medium transition-colors">
+                New Graph
             </button>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-1 flex overflow-hidden">
-        
-        <!-- Left Column: Visualization -->
-        <section class="flex-1 flex flex-col border-r border-slate-700 relative">
-            <!-- Canvas Container -->
-            <div id="canvas-container" class="flex-1 bg-slate-900 relative overflow-hidden">
-                <svg id="graph-svg" class="w-full h-full block">
-                    <!-- Definitions for arrowheads or glows -->
+    <main class="h-[calc(100vh-40px)] grid grid-cols-12 gap-3 p-3">
+        <!-- Visualization Panel -->
+        <section class="col-span-8 flex flex-col gap-3 min-h-0">
+            <!-- Graph Canvas -->
+            <div class="glass-panel rounded-lg flex-1 min-h-0 relative">
+                <svg id="graph-svg" class="w-full h-full">
                     <defs>
                         <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                            <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
                             <feMerge>
-                                <feMergeNode in="coloredBlur"/>
-                                <feMergeNode in="SourceGraphic"/>
+                                <feMergeNode in="coloredBlur" />
+                                <feMergeNode in="SourceGraphic" />
                             </feMerge>
                         </filter>
                     </defs>
                     <g id="edges-layer"></g>
                     <g id="nodes-layer"></g>
                 </svg>
-
                 <!-- Legend -->
-                <div class="absolute top-4 left-4 bg-slate-800/90 backdrop-blur border border-slate-700 p-3 rounded-lg shadow-xl text-xs">
-                    <div class="flex items-center gap-2 mb-1">
-                        <div class="w-3 h-3 rounded-full bg-slate-600 border border-slate-400"></div>
-                        <span class="text-slate-300">Unvisited</span>
+                <div class="absolute top-2 left-2 glass-panel rounded px-2 py-1.5 text-[10px] space-y-1">
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-2 h-2 rounded-full bg-slate-600 border border-slate-400"></div>
+                        <span class="text-slate-400">Unvisited</span>
                     </div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <div class="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-300"></div>
-                        <span class="text-slate-300">Considering</span>
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                        <span class="text-slate-400">Considering</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <div class="w-3 h-3 rounded-full bg-emerald-500 border border-emerald-300"></div>
-                        <span class="text-slate-300">In MST</span>
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                        <span class="text-slate-400">In MST</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Playback Controls -->
-            <div class="h-20 bg-slate-800 border-t border-slate-700 flex items-center justify-between px-6 shrink-0">
-                
-                <div class="flex items-center gap-4">
-                    <button id="btn-start" onclick="visualizer.toStart()" class="control-btn p-2 rounded-full hover:bg-slate-700 text-slate-400 hover:text-white" title="Go to Start">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" /></svg>
+            <!-- Controls Bar -->
+            <div class="glass-panel rounded-lg px-3 py-2 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2">
+                    <button onclick="visualizer.toStart()"
+                        class="control-btn p-1 rounded hover:bg-slate-700/50 text-slate-400 hover:text-white"
+                        title="Start">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                        </svg>
                     </button>
-                    <button id="btn-prev" onclick="visualizer.stepBack()" class="control-btn p-2 rounded-full hover:bg-slate-700 text-slate-400 hover:text-white" title="Previous Step">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    <button onclick="visualizer.stepBack()"
+                        class="control-btn p-1 rounded hover:bg-slate-700/50 text-slate-400 hover:text-white"
+                        title="Previous">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
                     </button>
-                    
-                    <button id="btn-play" onclick="visualizer.togglePlay()" class="control-btn bg-white text-slate-900 p-3 rounded-full hover:bg-indigo-50 shadow-lg shadow-white/10 transition-colors">
-                        <svg id="icon-play" class="w-6 h-6 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                        <svg id="icon-pause" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                    <button onclick="visualizer.togglePlay()"
+                        class="control-btn bg-indigo-600 hover:bg-indigo-500 text-white p-1.5 rounded-full"
+                        title="Play/Pause">
+                        <svg id="icon-play" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                        <svg id="icon-pause" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                        </svg>
                     </button>
-
-                    <button id="btn-next" onclick="visualizer.stepForward()" class="control-btn p-2 rounded-full hover:bg-slate-700 text-slate-400 hover:text-white" title="Next Step">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    <button onclick="visualizer.stepForward()"
+                        class="control-btn p-1 rounded hover:bg-slate-700/50 text-slate-400 hover:text-white"
+                        title="Next">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
                     </button>
                 </div>
 
-                <div class="flex flex-col w-1/3">
-                    <div class="flex justify-between text-xs text-slate-400 mb-1">
-                        <span>Speed</span>
-                        <span id="speed-label">1x</span>
-                    </div>
-                    <input type="range" min="0.5" max="3" step="0.5" value="1" oninput="visualizer.setSpeed(this.value)" class="w-full h-1 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                <div class="flex items-center gap-2 flex-1 max-w-[150px] mx-4">
+                    <span class="text-[10px] text-slate-500">Speed</span>
+                    <input type="range" id="speed-slider" min="0.5" max="3" step="0.5" value="1"
+                        oninput="visualizer.setSpeed(this.value)"
+                        class="flex-1 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                    <span id="speed-label" class="text-[10px] text-slate-400 w-5">1x</span>
                 </div>
 
                 <div class="text-right">
-                    <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Current Step</div>
-                    <div id="step-counter" class="text-xl font-mono font-bold text-white">0 / 0</div>
+                    <span class="text-[10px] text-slate-500">Step </span>
+                    <span id="step-counter" class="text-xs font-mono text-white">0/0</span>
                 </div>
-
             </div>
-            
-            <!-- Explanation Bar -->
-            <div class="bg-indigo-900/30 border-t border-indigo-500/30 px-6 py-2">
-                <p id="status-text" class="text-indigo-200 text-sm font-medium animate-pulse">Ready to start...</p>
+
+            <!-- Status Bar -->
+            <div class="glass-panel rounded-lg px-3 py-1.5 shrink-0 border-l-2 border-indigo-500">
+                <p id="status-text" class="text-xs text-indigo-300">Ready to start...</p>
             </div>
         </section>
 
-        <!-- Right Column: Info Panel -->
-        <aside class="w-[450px] bg-slate-850 flex flex-col border-l border-slate-700 overflow-y-auto">
-            
+        <!-- Sidebar -->
+        <aside class="col-span-4 flex flex-col gap-3 min-h-0">
             <!-- Pseudocode -->
-            <div class="p-4 border-b border-slate-700">
-                <h2 class="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+            <div class="glass-panel rounded-lg p-2 shrink-0">
+                <h2
+                    class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
                     Pseudocode
                 </h2>
-                <div class="bg-slate-900 rounded-lg p-3 font-mono text-xs text-slate-400 leading-relaxed shadow-inner border border-slate-800" id="code-panel">
-                    <div class="code-line px-2 py-0.5" id="line-1">algorithm Prim(Graph, startNode):</div>
-                    <div class="code-line px-2 py-0.5" id="line-2">  for each u in V: key[u] = ∞, parent[u] = null</div>
-                    <div class="code-line px-2 py-0.5" id="line-3">  key[startNode] = 0</div>
-                    <div class="code-line px-2 py-0.5" id="line-4">  MST = {}</div>
-                    <div class="code-line px-2 py-0.5" id="line-5">  while MST is not full:</div>
-                    <div class="code-line px-2 py-0.5" id="line-6">    u = node with min key not in MST</div>
-                    <div class="code-line px-2 py-0.5" id="line-7">    add u to MST</div>
-                    <div class="code-line px-2 py-0.5" id="line-8">    for each neighbor v of u:</div>
-                    <div class="code-line px-2 py-0.5" id="line-9">      if v not in MST and weight(u,v) < key[v]:</div>
-                    <div class="code-line px-2 py-0.5" id="line-10">        key[v] = weight(u,v)</div>
-                    <div class="code-line px-2 py-0.5" id="line-11">        parent[v] = u</div>
+                <div id="code-panel"
+                    class="bg-slate-900/50 rounded p-1.5 font-mono text-[10px] text-slate-400 leading-relaxed">
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-1">Prim(Graph, start):</div>
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-2"> ∀u: key[u]=∞, parent[u]=null</div>
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-3"> key[start] = 0</div>
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-4"> MST = {}</div>
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-5"> while MST not full:</div>
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-6"> u = minKey(not in MST)</div>
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-7"> MST.add(u)</div>
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-8"> for v in neighbors(u):</div>
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-9"> if v∉MST ∧ w(u,v)&lt;key[v]:</div>
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-10"> key[v] = w(u,v)</div>
+                    <div class="code-line px-1.5 py-0.5 rounded" id="line-11"> parent[v] = u</div>
                 </div>
             </div>
 
-            <!-- Priority Queue / Table State -->
-            <div class="p-4 flex-1">
-                <h2 class="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                    Node Table (Priority Queue)
+            <!-- Node Table -->
+            <div class="glass-panel rounded-lg p-2 flex-1 min-h-0 flex flex-col">
+                <h2
+                    class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Priority Queue
                 </h2>
-                <div class="overflow-hidden rounded-lg border border-slate-700 shadow-sm">
-                    <table class="w-full text-xs text-left">
-                        <thead class="bg-slate-800 text-slate-400 font-medium">
+                <div class="flex-1 min-h-0 overflow-auto rounded border border-slate-700/50">
+                    <table class="w-full text-[10px]">
+                        <thead class="bg-slate-800/50 text-slate-500 sticky top-0">
                             <tr>
-                                <th class="px-3 py-2">Node</th>
-                                <th class="px-3 py-2">Key (Dist)</th>
-                                <th class="px-3 py-2">Parent</th>
-                                <th class="px-3 py-2 text-center">In MST</th>
+                                <th class="px-2 py-1 text-left font-medium">Node</th>
+                                <th class="px-2 py-1 text-left font-medium">Key</th>
+                                <th class="px-2 py-1 text-left font-medium">Parent</th>
+                                <th class="px-2 py-1 text-center font-medium">MST</th>
                             </tr>
                         </thead>
-                        <tbody id="data-table-body" class="bg-slate-900 text-slate-300 divide-y divide-slate-800">
-                            <!-- Rows generated by JS -->
+                        <tbody id="data-table-body" class="text-slate-300 divide-y divide-slate-800/50">
                         </tbody>
                     </table>
                 </div>
-                <p class="text-[10px] text-slate-500 mt-2 italic">* Nodes sorted by ID here, but algorithm picks based on Min Key.</p>
             </div>
 
-            <!-- Complexity Info -->
-            <div class="p-4 border-t border-slate-700 bg-slate-800/50">
-                <h3 class="text-xs font-bold text-slate-400 uppercase mb-2">Complexity Analysis</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-slate-800 p-2 rounded border border-slate-700">
-                        <span class="text-xs text-slate-500 block">Time (Adj Matrix)</span>
-                        <span class="font-mono text-sm text-indigo-400 font-bold">O(V²)</span>
+            <!-- Complexity -->
+            <div class="glass-panel rounded-lg p-2 shrink-0">
+                <h2 class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Complexity</h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="bg-slate-900/50 rounded p-1.5 text-center">
+                        <div class="text-[9px] text-slate-500">Time (Matrix)</div>
+                        <div class="text-xs font-mono text-indigo-400 font-bold">O(V²)</div>
                     </div>
-                    <div class="bg-slate-800 p-2 rounded border border-slate-700">
-                        <span class="text-xs text-slate-500 block">Space</span>
-                        <span class="font-mono text-sm text-emerald-400 font-bold">O(V)</span>
+                    <div class="bg-slate-900/50 rounded p-1.5 text-center">
+                        <div class="text-[9px] text-slate-500">Space</div>
+                        <div class="text-xs font-mono text-emerald-400 font-bold">O(V)</div>
                     </div>
                 </div>
-                <p class="text-xs text-slate-400 mt-2 leading-snug">
-                    This implementation uses an Adjacency Matrix approach. Using a Binary Heap (Priority Queue) and Adjacency List would yield 
-                    <span class="font-mono text-indigo-300">O(E log V)</span>.
-                </p>
+                <p class="text-[9px] text-slate-500 mt-1.5">With Binary Heap + Adj List: <span
+                        class="text-indigo-400 font-mono">O(E log V)</span></p>
             </div>
         </aside>
     </main>
 
     <script>
         // --- Geometry & Graph Classes ---
-
         class Node {
             constructor(id, x, y) {
                 this.id = id;
@@ -285,15 +302,13 @@
         }
 
         // --- Data Generation ---
-
         const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         function generateRandomGraph(nodeCount = 6, width = 800, height = 600) {
             const nodes = [];
             const edges = [];
-            const margin = 50;
+            const margin = 40;
 
-            // Generate Nodes avoiding too much overlap
             for (let i = 0; i < nodeCount; i++) {
                 let x, y, tooClose;
                 let attempts = 0;
@@ -303,57 +318,44 @@
                     tooClose = false;
                     for (let n of nodes) {
                         const dist = Math.hypot(n.x - x, n.y - y);
-                        if (dist < 80) tooClose = true;
+                        if (dist < 70) tooClose = true;
                     }
                     attempts++;
                 } while (tooClose && attempts < 100);
                 nodes.push(new Node(LETTERS[i], x, y));
             }
 
-            // Generate Edges (Connected Graph)
-            // Strategy: Create a spanning tree first to ensure connectivity, then add random edges
             const connected = new Set([0]);
-            const uncomnnected = new Set(Array.from({length: nodeCount}, (_, i) => i).slice(1));
+            const unconnected = new Set(Array.from({ length: nodeCount }, (_, i) => i).slice(1));
 
-            // 1. Connect everyone
-            while (uncomnnected.size > 0) {
+            while (unconnected.size > 0) {
                 const u = Array.from(connected)[Math.floor(Math.random() * connected.size)];
-                const vArr = Array.from(uncomnnected);
-                // Find a somewhat close node to avoid messy cross-screen lines
-                // Simplified: just pick random
+                const vArr = Array.from(unconnected);
                 const v = vArr[Math.floor(Math.random() * vArr.length)];
-                
-                const weight = Math.floor(Math.random() * 9) + 1; // 1-10
+                const weight = Math.floor(Math.random() * 9) + 1;
                 edges.push(new Edge(nodes[u], nodes[v], weight));
-                
-                uncomnnected.delete(v);
+                unconnected.delete(v);
                 connected.add(v);
             }
 
-            // 2. Add extra random edges to make it interesting
             const extraEdges = Math.floor(nodeCount * 1.5);
-            for(let i=0; i<extraEdges; i++) {
+            for (let i = 0; i < extraEdges; i++) {
                 const uIdx = Math.floor(Math.random() * nodeCount);
                 const vIdx = Math.floor(Math.random() * nodeCount);
                 if (uIdx === vIdx) continue;
-                
-                // Check if exists
-                const existing = edges.find(e => 
-                    (e.source === nodes[uIdx] && e.target === nodes[vIdx]) || 
+                const existing = edges.find(e =>
+                    (e.source === nodes[uIdx] && e.target === nodes[vIdx]) ||
                     (e.source === nodes[vIdx] && e.target === nodes[uIdx])
                 );
-                
                 if (!existing) {
                     const weight = Math.floor(Math.random() * 9) + 1;
                     edges.push(new Edge(nodes[uIdx], nodes[vIdx], weight));
                 }
             }
-
             return { nodes, edges };
         }
 
         // --- Visualizer Logic ---
-
         class PrimsVisualizer {
             constructor() {
                 this.svg = document.getElementById('graph-svg');
@@ -362,7 +364,7 @@
                 this.statusText = document.getElementById('status-text');
                 this.stepCounter = document.getElementById('step-counter');
                 this.tableBody = document.getElementById('data-table-body');
-                
+
                 this.nodes = [];
                 this.edges = [];
                 this.trace = [];
@@ -371,44 +373,51 @@
                 this.playbackSpeed = 1000;
                 this.timer = null;
 
-                // Color Constants
                 this.colors = {
-                    nodeDefault: '#1e293b', // slate-800
-                    nodeStrokeDefault: '#94a3b8', // slate-400
-                    nodeMST: '#10b981', // emerald-500
-                    nodeConsidering: '#eab308', // yellow-500
-                    
-                    edgeDefault: '#475569', // slate-600
+                    nodeDefault: '#1e293b',
+                    nodeStrokeDefault: '#94a3b8',
+                    nodeMST: '#10b981',
+                    nodeConsidering: '#eab308',
+                    edgeDefault: '#475569',
                     edgeMST: '#10b981',
                     edgeConsidering: '#eab308',
-                    
                     textDefault: '#f1f5f9'
                 };
 
-                // Resize observer
-                new ResizeObserver(() => this.reset()).observe(document.getElementById('canvas-container'));
+                new ResizeObserver(() => this.handleResize()).observe(this.svg.parentElement);
+            }
+
+            handleResize() {
+                if (this.nodes.length > 0) {
+                    const container = this.svg.parentElement;
+                    const width = container.clientWidth;
+                    const height = container.clientHeight;
+                    const data = generateRandomGraph(7, width, height);
+                    this.nodes = data.nodes;
+                    this.edges = data.edges;
+                    this.drawGraph();
+                    this.generateTrace();
+                    this.currentStep = 0;
+                    this.applyState(0);
+                }
             }
 
             generateNewGraph() {
-                const container = document.getElementById('canvas-container');
+                const container = this.svg.parentElement;
                 const width = container.clientWidth;
                 const height = container.clientHeight;
-                
                 const data = generateRandomGraph(7, width, height);
                 this.nodes = data.nodes;
                 this.edges = data.edges;
-                
                 this.drawGraph();
                 this.generateTrace();
                 this.reset();
             }
 
             drawGraph() {
-                // Clear SVG
                 this.nodesGroup.innerHTML = '';
                 this.edgesGroup.innerHTML = '';
 
-                // Draw Edges
                 this.edges.forEach(edge => {
                     const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                     line.setAttribute("x1", edge.source.x);
@@ -420,32 +429,29 @@
                     line.setAttribute("id", edge.id);
                     this.edgesGroup.appendChild(line);
 
-                    // Weight Label Background
                     const midX = (edge.source.x + edge.target.x) / 2;
                     const midY = (edge.source.y + edge.target.y) / 2;
-                    
+
                     const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-                    rect.setAttribute("x", midX - 8);
-                    rect.setAttribute("y", midY - 8);
-                    rect.setAttribute("width", 16);
-                    rect.setAttribute("height", 16);
-                    rect.setAttribute("rx", 4);
-                    rect.setAttribute("fill", "#0f172a"); // Matches bg
+                    rect.setAttribute("x", midX - 7);
+                    rect.setAttribute("y", midY - 7);
+                    rect.setAttribute("width", 14);
+                    rect.setAttribute("height", 14);
+                    rect.setAttribute("rx", 3);
+                    rect.setAttribute("fill", "#0f172a");
                     this.edgesGroup.appendChild(rect);
 
-                    // Weight Label
                     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                     text.setAttribute("x", midX);
-                    text.setAttribute("y", midY + 4);
+                    text.setAttribute("y", midY + 3);
                     text.setAttribute("text-anchor", "middle");
                     text.setAttribute("fill", "#94a3b8");
-                    text.setAttribute("font-size", "12");
+                    text.setAttribute("font-size", "10");
                     text.setAttribute("font-weight", "bold");
                     text.textContent = edge.weight;
                     this.edgesGroup.appendChild(text);
                 });
 
-                // Draw Nodes
                 this.nodes.forEach(node => {
                     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
                     g.setAttribute("id", `node-g-${node.id}`);
@@ -454,19 +460,19 @@
                     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                     circle.setAttribute("cx", node.x);
                     circle.setAttribute("cy", node.y);
-                    circle.setAttribute("r", "18");
+                    circle.setAttribute("r", "16");
                     circle.setAttribute("fill", this.colors.nodeDefault);
                     circle.setAttribute("stroke", this.colors.nodeStrokeDefault);
                     circle.setAttribute("stroke-width", "2");
                     circle.setAttribute("id", `node-${node.id}`);
-                    circle.classList.add("node-circle");
 
                     const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
                     text.setAttribute("x", node.x);
-                    text.setAttribute("y", node.y + 5);
+                    text.setAttribute("y", node.y + 4);
                     text.setAttribute("text-anchor", "middle");
                     text.setAttribute("fill", "white");
                     text.setAttribute("font-weight", "bold");
+                    text.setAttribute("font-size", "11");
                     text.setAttribute("font-family", "monospace");
                     text.textContent = node.id;
 
@@ -483,21 +489,19 @@
                 this.nodes.forEach(node => {
                     const row = document.createElement('tr');
                     row.id = `row-${node.id}`;
-                    row.className = "border-b border-slate-800 transition-colors duration-300";
+                    row.className = "transition-colors duration-200";
                     row.innerHTML = `
-                        <td class="px-3 py-2 font-mono font-bold text-slate-200">${node.id}</td>
-                        <td class="px-3 py-2 font-mono text-slate-400" id="cell-key-${node.id}">∞</td>
-                        <td class="px-3 py-2 font-mono text-slate-400" id="cell-parent-${node.id}">-</td>
-                        <td class="px-3 py-2 text-center" id="cell-mst-${node.id}">
-                            <span class="inline-block w-2 h-2 rounded-full bg-slate-600"></span>
+                        <td class="px-2 py-1 font-mono font-bold text-slate-300">${node.id}</td>
+                        <td class="px-2 py-1 font-mono text-slate-500" id="cell-key-${node.id}">∞</td>
+                        <td class="px-2 py-1 font-mono text-slate-500" id="cell-parent-${node.id}">-</td>
+                        <td class="px-2 py-1 text-center" id="cell-mst-${node.id}">
+                            <span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-600"></span>
                         </td>
                     `;
                     this.tableBody.appendChild(row);
                 });
             }
 
-            // --- Algorithm Implementation (The Trace Engine) ---
-            
             generateTrace() {
                 this.trace = [];
                 const startNode = this.nodes[0];
@@ -506,20 +510,18 @@
                 const mstSet = {};
                 const nodeCount = this.nodes.length;
 
-                // Helper to snapshot state
                 const snap = (line, msg, highlights = {}, edgeHighlights = {}) => {
                     this.trace.push({
                         line: line,
                         message: msg,
-                        keyState: {...key},
-                        parentState: {...parent},
-                        mstState: {...mstSet},
-                        highlights: highlights, // { nodeId: color }
-                        edgeHighlights: edgeHighlights // { edgeId: color }
+                        keyState: { ...key },
+                        parentState: { ...parent },
+                        mstState: { ...mstSet },
+                        highlights: highlights,
+                        edgeHighlights: edgeHighlights
                     });
                 };
 
-                // Initialization
                 this.nodes.forEach(n => {
                     key[n.id] = Infinity;
                     parent[n.id] = null;
@@ -527,20 +529,16 @@
                 });
 
                 snap(2, "Initialize all keys to ∞ and parents to null.");
-
                 key[startNode.id] = 0;
                 snap(3, `Set Start Node ${startNode.id} key to 0.`);
 
-                // MST Loop
                 for (let i = 0; i < nodeCount; i++) {
                     snap(5, "Checking for node with minimum key not in MST...");
 
-                    // Find min key node
                     let u = null;
                     let minVal = Infinity;
-
-                    // Visualization: Highlight all candidates
                     let candidates = {};
+
                     this.nodes.forEach(n => {
                         if (!mstSet[n.id]) {
                             candidates[n.id] = this.colors.nodeConsidering;
@@ -551,125 +549,101 @@
                         }
                     });
 
-                    if (u === null) break; // Should not happen in connected graph
+                    if (u === null) break;
 
-                    snap(6, `Selected Node ${u.id} (Min Key: ${minVal}).`, {[u.id]: this.colors.nodeConsidering});
-                    
-                    // Add to MST
+                    snap(6, `Selected Node ${u.id} (Min Key: ${minVal}).`, { [u.id]: this.colors.nodeConsidering });
+
                     mstSet[u.id] = true;
-                    
-                    // Highlight the edge that connected u to MST (if not start node)
+
                     let confirmedEdges = {};
                     if (parent[u.id] !== null) {
-                        // Find edge
                         const pId = parent[u.id];
                         const edgeId1 = `e-${pId}-${u.id}`;
                         const edgeId2 = `e-${u.id}-${pId}`;
                         const realEdge = this.edges.find(e => e.id === edgeId1 || e.id === edgeId2);
-                        if(realEdge) confirmedEdges[realEdge.id] = this.colors.edgeMST;
+                        if (realEdge) confirmedEdges[realEdge.id] = this.colors.edgeMST;
                     }
-                    
-                    snap(7, `Added ${u.id} to MST set.`, {[u.id]: this.colors.nodeMST}, confirmedEdges);
 
-                    // Check neighbors
+                    snap(7, `Added ${u.id} to MST set.`, { [u.id]: this.colors.nodeMST }, confirmedEdges);
+
                     const neighbors = this.edges.filter(e => e.source === u || e.target === u);
-                    
-                    snap(8, `Checking neighbors of ${u.id}...`, {[u.id]: this.colors.nodeMST});
+                    snap(8, `Checking neighbors of ${u.id}...`, { [u.id]: this.colors.nodeMST });
 
                     for (let edge of neighbors) {
                         const v = (edge.source === u) ? edge.target : edge.source;
-                        
-                        // Highlight edge being checked
-                        snap(9, `Checking edge (${u.id}, ${v.id}) with weight ${edge.weight}.`, 
-                             {[u.id]: this.colors.nodeMST, [v.id]: this.colors.nodeConsidering},
-                             {[edge.id]: this.colors.edgeConsidering});
+
+                        snap(9, `Checking edge (${u.id}, ${v.id}) with weight ${edge.weight}.`,
+                            { [u.id]: this.colors.nodeMST, [v.id]: this.colors.nodeConsidering },
+                            { [edge.id]: this.colors.edgeConsidering });
 
                         if (!mstSet[v.id] && edge.weight < key[v.id]) {
                             snap(10, `Update needed! ${edge.weight} < ${key[v.id] === Infinity ? '∞' : key[v.id]}.`,
-                                 {[u.id]: this.colors.nodeMST, [v.id]: this.colors.nodeConsidering},
-                                 {[edge.id]: this.colors.edgeConsidering});
-                            
+                                { [u.id]: this.colors.nodeMST, [v.id]: this.colors.nodeConsidering },
+                                { [edge.id]: this.colors.edgeConsidering });
+
                             key[v.id] = edge.weight;
                             parent[v.id] = u.id;
-                            
+
                             snap(11, `Updated ${v.id}: Key = ${edge.weight}, Parent = ${u.id}.`,
-                                 {[u.id]: this.colors.nodeMST, [v.id]: this.colors.nodeConsidering},
-                                 {[edge.id]: this.colors.edgeConsidering});
+                                { [u.id]: this.colors.nodeMST, [v.id]: this.colors.nodeConsidering },
+                                { [edge.id]: this.colors.edgeConsidering });
                         }
                     }
                 }
                 snap(1, "MST Construction Complete.", {}, {});
             }
 
-            // --- Playback Logic ---
-
             applyState(stepIndex) {
-                if(stepIndex < 0 || stepIndex >= this.trace.length) return;
-                
+                if (stepIndex < 0 || stepIndex >= this.trace.length) return;
+
                 const step = this.trace[stepIndex];
-                
-                // 1. Update Text Info
+
                 this.statusText.textContent = step.message;
-                this.stepCounter.textContent = `${stepIndex + 1} / ${this.trace.length}`;
-                
-                // 2. Highlight Code
+                this.stepCounter.textContent = `${stepIndex + 1}/${this.trace.length}`;
+
                 document.querySelectorAll('.code-line').forEach(el => el.classList.remove('code-active'));
                 const lineEl = document.getElementById(`line-${step.line}`);
-                if(lineEl) lineEl.classList.add('code-active');
-                if(lineEl) lineEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (lineEl) lineEl.classList.add('code-active');
 
-                // 3. Update Table
                 this.nodes.forEach(n => {
                     const k = step.keyState[n.id];
                     const p = step.parentState[n.id];
                     const inMST = step.mstState[n.id];
 
                     document.getElementById(`cell-key-${n.id}`).textContent = k === Infinity ? '∞' : k;
-                    document.getElementById(`cell-key-${n.id}`).className = `px-3 py-2 font-mono transition-colors ${k !== Infinity ? 'text-indigo-400 font-bold' : 'text-slate-400'}`;
-                    
+                    document.getElementById(`cell-key-${n.id}`).className = `px-2 py-1 font-mono transition-colors ${k !== Infinity ? 'text-indigo-400 font-bold' : 'text-slate-500'}`;
                     document.getElementById(`cell-parent-${n.id}`).textContent = p ? p : '-';
-                    
+
                     const mstCell = document.getElementById(`cell-mst-${n.id}`);
                     if (inMST) {
-                        mstCell.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>`;
-                        document.getElementById(`row-${n.id}`).classList.add('bg-slate-800/50');
+                        mstCell.innerHTML = `<span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)]"></span>`;
+                        document.getElementById(`row-${n.id}`).classList.add('bg-emerald-900/20');
                     } else {
-                        mstCell.innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-slate-600"></span>`;
-                        document.getElementById(`row-${n.id}`).classList.remove('bg-slate-800/50');
+                        mstCell.innerHTML = `<span class="inline-block w-1.5 h-1.5 rounded-full bg-slate-600"></span>`;
+                        document.getElementById(`row-${n.id}`).classList.remove('bg-emerald-900/20');
                     }
                 });
 
-                // 4. Update Graph Visuals (GSAP)
-                
-                // Reset all to base state based on MST status
                 this.nodes.forEach(n => {
                     const isMST = step.mstState[n.id];
                     const color = isMST ? this.colors.nodeMST : this.colors.nodeDefault;
                     const stroke = isMST ? this.colors.nodeMST : this.colors.nodeStrokeDefault;
-                    
-                    // Check if specifically highlighted in this step
+
                     let targetFill = color;
                     let targetStroke = stroke;
-                    
+
                     if (step.highlights[n.id]) {
                         targetFill = step.highlights[n.id];
                         targetStroke = step.highlights[n.id];
                     }
 
-                    gsap.to(`#node-${n.id}`, {
-                        fill: targetFill,
-                        stroke: targetStroke,
-                        duration: 0.3
-                    });
+                    gsap.to(`#node-${n.id}`, { fill: targetFill, stroke: targetStroke, duration: 0.2 });
                 });
 
-                // Edges
                 this.edges.forEach(e => {
-                    // Is this edge part of the current MST structure?
-                    // An edge is in MST if parent[v] == u or parent[u] == v AND v is in MST
                     const u = e.source.id;
                     const v = e.target.id;
-                    
+
                     let isMSTEdge = false;
                     if (step.mstState[u] && step.parentState[u] === v) isMSTEdge = true;
                     if (step.mstState[v] && step.parentState[v] === u) isMSTEdge = true;
@@ -677,21 +651,14 @@
                     let color = isMSTEdge ? this.colors.edgeMST : this.colors.edgeDefault;
                     let width = isMSTEdge ? 3 : 2;
 
-                    // Ephemeral highlight from trace
                     if (step.edgeHighlights && step.edgeHighlights[e.id]) {
                         color = step.edgeHighlights[e.id];
-                        width = 4;
+                        width = 3;
                     }
 
-                    gsap.to(`#${e.id}`, {
-                        stroke: color,
-                        strokeWidth: width,
-                        duration: 0.3
-                    });
+                    gsap.to(`#${e.id}`, { stroke: color, strokeWidth: width, duration: 0.2 });
                 });
             }
-
-            // --- Controls ---
 
             stepForward() {
                 if (this.currentStep < this.trace.length - 1) {
@@ -725,12 +692,11 @@
 
             play() {
                 if (this.currentStep >= this.trace.length - 1) {
-                    this.currentStep = 0; // Restart if at end
+                    this.currentStep = 0;
                 }
                 this.isPlaying = true;
                 document.getElementById('icon-play').classList.add('hidden');
                 document.getElementById('icon-pause').classList.remove('hidden');
-                
                 this.runLoop();
             }
 
@@ -743,9 +709,7 @@
 
             runLoop() {
                 if (!this.isPlaying) return;
-                
                 this.stepForward();
-                
                 if (this.currentStep < this.trace.length - 1) {
                     this.timer = setTimeout(() => this.runLoop(), this.playbackSpeed);
                 } else {
@@ -754,9 +718,6 @@
             }
 
             setSpeed(val) {
-                // slider: 0.5 to 3. 
-                // speed ms: high val = slow. 
-                // 1x = 1000ms. 2x = 500ms. 
                 const multipliers = { '0.5': 2000, '1': 1000, '1.5': 666, '2': 500, '2.5': 400, '3': 300 };
                 this.playbackSpeed = multipliers[val.toString()] || 1000;
                 document.getElementById('speed-label').textContent = val + 'x';
@@ -769,14 +730,9 @@
             }
         }
 
-        // Initialize
         const visualizer = new PrimsVisualizer();
-        
-        // Wait for fonts/DOM
-        window.onload = () => {
-            visualizer.generateNewGraph();
-        };
-
+        window.onload = () => { visualizer.generateNewGraph(); };
     </script>
 </body>
+
 </html>
